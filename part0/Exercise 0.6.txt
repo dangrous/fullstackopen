@@ -1,0 +1,5 @@
+title Exercise 0.6
+
+note over browser: browser adds note to list of notes in document and rerenders it
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+note over server: server adds new note object to array notes
