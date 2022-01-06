@@ -5,7 +5,6 @@ const App = () => {
   const [good, setGood] = useState(0)
   const [neutral, setNeutral] = useState(0)
   const [bad, setBad] = useState(0)
-  const [all, setAll] = useState(0)
 
   return (
     <div>
@@ -24,14 +23,16 @@ const Statistics = ({good, neutral, bad}) => {
     return <div>No feedback given</div>
   } else {  
     return (
-      <>
-        <StatisticLine value={good} text="good" />
-        <StatisticLine value={neutral} text="neutral" />
-        <StatisticLine value={bad} text="bad" />
-        <StatisticLine value={good+neutral+bad} text="all" />
-        <StatisticLine value={(good - bad)/(good+neutral+bad)} text="average" />
-        <StatisticLine value={good/(good+neutral+bad)*100} text="positive" suffix="%" />
-      </>
+      <table>
+        <tbody>
+          <StatisticLine value={good} text="good" />
+          <StatisticLine value={neutral} text="neutral" />
+          <StatisticLine value={bad} text="bad" />
+          <StatisticLine value={good+neutral+bad} text="all" />
+          <StatisticLine value={(good - bad)/(good+neutral+bad)} text="average" />
+          <StatisticLine value={good/(good+neutral+bad)*100} text="positive" suffix="%" />
+        </tbody>
+      </table>
     )
   }
 }
@@ -39,7 +40,11 @@ const Statistics = ({good, neutral, bad}) => {
 const Button = ({handleClick, text}) =>
   <button onClick={handleClick}>{text}</button>
 
-const StatisticLine = ({value, text, suffix}) =>
-  <div>{text} {value} {suffix}</div>
+const StatisticLine = ({value, text, suffix}) => (
+  <tr>
+    <td>{text}</td>
+    <td>{value} {suffix}</td>
+  </tr>
+)
 
 export default App;
