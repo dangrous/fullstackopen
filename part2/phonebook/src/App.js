@@ -60,6 +60,13 @@ const App = () => {
     setSearch(event.target.value);
   };
 
+  const handleDelete = (name, id) => {
+    if (window.confirm(`Delete ${name}?`)) {
+      personService.deletePerson(id)
+      setPersons(persons.filter(person => person.id !== id))
+    }
+  }
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -67,7 +74,7 @@ const App = () => {
       <h3>add a new</h3>
       <Form addPerson={addPerson} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
       <h3>Numbers</h3>
-      <Numbers persons={persons} search={search} />
+      <Numbers persons={persons} search={search} handleDelete={handleDelete} />
     </div>
   );
 };
