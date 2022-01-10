@@ -32,23 +32,47 @@ const Results = ({countries}) => {
   if (countries.length > 10) {
     return <div>Too many matches, specify another filter</div>
   } else if (countries.length > 1) {
-    return countries.map(country => <div key={country.name.common}>{country.name.common}</div>)
+    return countries.map(country => <Country country={country} display={false} />)
   } else if (countries.length === 1) {
     return (
-      <div>
-        <h2>{countries[0].name.common}</h2>
-        <div>Capital: {countries[0].capital}</div>
-        <div>Population: {countries[0].population}</div>
-        <h3>Languages</h3>
-        <ul>
-          {Object.entries(countries[0].languages).map(([k,v]) =>
-            <li>{v}</li>)}
-        </ul>
-        <img src={countries[0].flags.png} alt={"The flag of "+countries[0].name.common} />
-      </div>
+      <Country country={countries[0]} display={true} />
     )
   } else {
     return <div>No matches</div>
+  }
+}
+
+const Country = ({country, display}) => {
+  const [displayToggle, setDisplayToggle] = useState(display)
+
+  const toggleDisplay = (display) => {
+    setDisplayToggle(!displayToggle)
+    console.log("Toggled");
+  }
+
+  if (!displayToggle) {
+    return (
+      <div key={country.name.common}>
+        {country.name.common}
+        {' '}
+        <button onClick={toggleDisplay}>Show Details</button>
+      </div>
+    )
+  } else {
+    return (
+      <div key={country.name.common}>
+        <h2>{country.name.common}</h2>
+        <div>Capital: {country.capital}</div>
+        <div>Population: {country.population}</div>
+        <h3>Languages</h3>
+        <ul>
+          {Object.entries(country.languages).map(([k,v]) =>
+            <li>{v}</li>)}
+        </ul>
+        <img src={country.flags.png} alt={"The flag of "+country.name.common} />
+        <div><button onClick={toggleDisplay}>Hide Details</button></div>
+      </div>
+    )
   }
 }
 
