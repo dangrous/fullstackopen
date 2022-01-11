@@ -9,7 +9,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
-  const [message, setMessage] = useState(null)
+  const [message, setMessage] = useState([null, false])
 
   useEffect(() => {
     personService
@@ -44,9 +44,9 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName("");
           setNewNumber("");
-          setMessage(`Added ${returnedPerson.name}`)
+          setMessage([`Added ${returnedPerson.name}`,false])
             setTimeout(() => {
-              setMessage(null)
+              setMessage([null, false])
             }, 5000)
         })
     } else {
@@ -57,9 +57,15 @@ const App = () => {
             setPersons(persons.map(person => person.id !== id ? person :returnedPerson))
             setNewName("");
             setNewNumber("");
-            setMessage(`Replaced ${returnedPerson.name}'s number`)
+            setMessage([`Replaced ${returnedPerson.name}'s number`,false])
             setTimeout(() => {
-              setMessage(null)
+              setMessage([null, false])
+            }, 5000)
+          })
+          .catch(error => {
+            setMessage([`Information of ${newPerson.name} has already been removed from server`, true])
+            setTimeout(() => {
+              setMessage([null, false])
             }, 5000)
           })
       }
@@ -82,13 +88,17 @@ const App = () => {
     if (window.confirm(`Delete ${name}?`)) {
       personService.deletePerson(id)
       setPersons(persons.filter(person => person.id !== id))
+      setMessage([`Removed ${name}`, false])
+            setTimeout(() => {
+              setMessage([null, false])
+            }, 5000)
     }
   }
 
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={message} />
+      <Notification message={message[0]} isError={message[1]} />
       <Filter search={search} handleSearchChange={handleSearchChange} />
       <h3>add a new</h3>
       <Form addPerson={addPerson} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
@@ -98,16 +108,24 @@ const App = () => {
   );
 };
 
-const Notification = ({ message}) => {
+const Notification = ({ message, isError }) => {
   if (message === null) {
     return null
   }
 
-  return (
-    <div className='alert'>
-      {message}
-    </div>
-  )
+  if (isError) {
+    return (
+      <div className='error'>
+        {message}
+      </div>
+    )
+  } else {
+    return (
+      <div className='alert'>
+        {message}
+      </div>
+    )
+  }
 }
 
 export default App;
