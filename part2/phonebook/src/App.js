@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from 'axios'
 import personService from './services/persons'
 import Numbers from "./components/Numbers"
 import Filter from "./components/Filter"
@@ -10,6 +9,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -44,6 +44,10 @@ const App = () => {
           setPersons(persons.concat(returnedPerson))
           setNewName("");
           setNewNumber("");
+          setMessage(`Added ${returnedPerson.name}`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
         })
     } else {
       if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
@@ -53,6 +57,10 @@ const App = () => {
             setPersons(persons.map(person => person.id !== id ? person :returnedPerson))
             setNewName("");
             setNewNumber("");
+            setMessage(`Replaced ${returnedPerson.name}'s number`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
           })
       }
     }
@@ -80,6 +88,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter search={search} handleSearchChange={handleSearchChange} />
       <h3>add a new</h3>
       <Form addPerson={addPerson} newName={newName} newNumber={newNumber} handleNameChange={handleNameChange} handleNumberChange={handleNumberChange} />
@@ -88,5 +97,17 @@ const App = () => {
     </div>
   );
 };
+
+const Notification = ({ message}) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className='alert'>
+      {message}
+    </div>
+  )
+}
 
 export default App;
