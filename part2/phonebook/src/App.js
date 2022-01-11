@@ -22,19 +22,22 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault();
     let duplicate = false;
+    let id = 0;
     // I think this can be done more elegantly and will need to be updated once there's more info in here...
     for (var i = 0; i < persons.length; i++) {
       if (newName === persons[i].name) {
         duplicate = true;
+        id = persons[i].id
         break;
       }
     }
-    if (!duplicate) {
-      const newPerson = {
-        name: newName,
-        number: newNumber ? newNumber : "(no number provided)",
-      };
+    
+    const newPerson = {
+      name: newName,
+      number: newNumber ? newNumber : "(no number provided)",
+    };
 
+    if (!duplicate) {
       personService
         .create(newPerson)
         .then(returnedPerson => {
@@ -42,9 +45,16 @@ const App = () => {
           setNewName("");
           setNewNumber("");
         })
-
     } else {
-      alert(`${newName} is already added to phonebook`);
+      if (window.confirm(`${newName} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .update(id, newPerson)
+          .then(returnedPerson => {
+            setPersons(persons.map(person => person.id !== id ? person :returnedPerson))
+            setNewName("");
+            setNewNumber("");
+          })
+      }
     }
   };
 
