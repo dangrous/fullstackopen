@@ -15,10 +15,16 @@ beforeEach(async () => {
   await Promise.all(promiseArray)
 })
 
-test.only('the correct number of blog posts is returned', async () => {
+test('the correct number of blog posts is returned', async () => {
   const response = await api.get('/api/blogs')
 
   expect(response.body).toHaveLength(helper.initialBlogs.length)
+})
+
+test.only('the unique identifier is named "id"', async () => {
+  const blogs = await helper.blogsInDb()
+
+  expect(blogs[0].id).toBeDefined()
 })
 
 afterAll(() => {
