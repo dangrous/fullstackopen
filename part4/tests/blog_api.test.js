@@ -99,6 +99,25 @@ test('deletion of blog succeeds if id is valid', async () => {
   expect(titles).not.toContain(blogToDelete.title)
 })
 
+test('like count for blog is updated', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToUpdate = blogsAtStart[0]
+  const testLikes = 1000
+
+  const updatedBlog = {
+    likes: testLikes
+  }
+
+  await api
+    .put(`/api/blogs/${blogToUpdate.id}`)
+    .send(updatedBlog)
+    .expect(200)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd[0].likes).toEqual(testLikes)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
