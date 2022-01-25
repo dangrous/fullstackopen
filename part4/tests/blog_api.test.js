@@ -63,7 +63,6 @@ test('if no likes are included in request it will default to 0', async () => {
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
-  console.log(addedBlog)
   expect(addedBlog.body.likes).toEqual(0)
 })
 
@@ -79,6 +78,25 @@ test('blog without title or url is not added', async () => {
 
   const blogsAtEnd = await helper.blogsInDb()
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+})
+
+test('deletion of blog succeeds if id is valid', async () => {
+  const blogsAtStart = await helper.blogsInDb()
+  const blogToDelete = blogsAtStart[0]
+
+  await api
+    .delete(`/api/blogs/${blogToDelete.id}`)
+    .expect(204)
+
+  const blogsAtEnd = await helper.blogsInDb()
+
+  expect(blogsAtEnd).toHaveLength(
+    helper.initialBlogs.length - 1
+  )
+
+  const titles = blogsAtEnd.map(r => r.title)
+
+  expect(titles).not.toContain(blogToDelete.title)
 })
 
 afterAll(() => {
