@@ -50,6 +50,23 @@ test('the unique identifier is named "id"', async () => {
   expect(blogs[0].id).toBeDefined()
 })
 
+test('if no likes are included in request it will default to 0', async () => {
+  const newBlog = {
+    title: "Testing 123",
+    author: "Testy McTesterFace",
+    url: "https://www.zombo.com/",
+  }
+
+  const addedBlog = await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(201)
+    .expect('Content-Type', /application\/json/)
+
+  console.log(addedBlog)
+  expect(addedBlog.body.likes).toEqual(0)
+})
+
 afterAll(() => {
   mongoose.connection.close()
 })
