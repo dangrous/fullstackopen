@@ -4,6 +4,5 @@ Content-Type: application/json
 {
   "notes": [],
   "username": "roertert",
-  "name": "Superuser",
-  "password": "te"
+  "name": "Superuser"
 }
