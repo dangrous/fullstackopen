@@ -8,16 +8,39 @@ const bcrypt = require('bcrypt')
 const Blog = require('../models/blog')
 const User = require('../models/user')
 
+let token;
+
 beforeEach(async () => {
+  await User.deleteMany({})
+
+  const newUser = {
+    username: 'testuser',
+    name: 'testuser',
+    password: 'testuser'
+  }
+
+  await api
+      .post('/api/users')
+      .send(newUser)
+
+  const tokenRequest = await api
+    .post('/api/login')
+    .send({ username: 'testuser', password: 'testuser' })
+
+  token = tokenRequest.body.token
+
+  const user = await User.findOne({})
+
   await Blog.deleteMany({})
   
   const blogObjects = helper.initialBlogs
-    .map(blog => new Blog(blog))
+    .map(blog => new Blog({ ...blog, user: user._id }))
   const promiseArray = blogObjects.map(blog => blog.save())
   await Promise.all(promiseArray)
 })
 
 test('a valid blog post can be added', async () => {
+  
   const newBlog = {
     title: "Testing 123",
     author: "Testy McTesterFace",
@@ -28,6 +51,7 @@ test('a valid blog post can be added', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set('Authorization', 'Bearer ' + token)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -62,6 +86,7 @@ test('if no likes are included in request it will default to 0', async () => {
   const addedBlog = await api
     .post('/api/blogs')
     .send(newBlog)
+    .set('Authorization', 'Bearer ' + token)
     .expect(201)
     .expect('Content-Type', /application\/json/)
 
@@ -76,7 +101,25 @@ test('blog without title or url is not added', async () => {
   await api
     .post('/api/blogs')
     .send(newBlog)
+    .set('Authorization', 'Bearer ' + token)
     .expect(400)
+
+  const blogsAtEnd = await helper.blogsInDb()
+  expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
+})
+
+test('statuscode 401 is returned if no token is provided with create request', async () => {
+  const newBlog = {
+    title: "Testing 123",
+    author: "Testy McTesterFace",
+    url: "https://www.zombo.com/",
+    likes: 700,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
 
   const blogsAtEnd = await helper.blogsInDb()
   expect(blogsAtEnd).toHaveLength(helper.initialBlogs.length)
@@ -88,6 +131,7 @@ test('deletion of blog succeeds if id is valid', async () => {
 
   await api
     .delete(`/api/blogs/${blogToDelete.id}`)
+    .set('Authorization', 'Bearer ' + token)
     .expect(204)
 
   const blogsAtEnd = await helper.blogsInDb()

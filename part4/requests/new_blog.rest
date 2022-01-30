@@ -3,8 +3,8 @@ Content-Type: application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmciLCJpZCI6IjYxZjFmYjhkNGNhMWMwNTcwNDRiMDQ5MSIsImlhdCI6MTY0MzI0OTc0MH0.frmF-4BxogzrZRFBB1pt2OxLhHfBPq1bwpipyHBBCTc
 
 {
-  "title": "Testing the Blog Thing with user extraction",
+  "title": "Testing the Blog Thing with wrong user authentication",
   "author": "Daniel",
   "url": "https://www.google.com",
-  "likes": 15344
+  "likes": 1
 }
