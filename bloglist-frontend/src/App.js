@@ -48,6 +48,19 @@ const App = () => {
     }
   }
 
+  const updateBlog = async (blogObject, blogId) => {
+    try {
+      await blogService.update(blogObject, blogId)
+      const newList = await blogService.getAll()
+      setBlogs(newList)
+    } catch (exception) {
+      setNotification(`Could not add the like to "${blogObject.title}"`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)
+    }
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -133,7 +146,7 @@ const App = () => {
       <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
       {blogForm()}
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
       )}
     </div>
   )

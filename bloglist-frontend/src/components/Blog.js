@@ -1,11 +1,21 @@
 import React, {useState} from 'react'
 
-const Blog = ({blog}) => {
+const Blog = ({blog, updateBlog}) => {
   const [visibility, setVisibility] = useState(false)
 
   const toggleVisibility = () => {
     setVisibility(!visibility)
     console.log('switching visibility')
+  }
+
+  const addLike = () => {
+    updateBlog({
+      user: blog.user.id,
+      likes: blog.likes + 1,
+      author: blog.author,
+      title: blog.title,
+      url: blog.url
+    }, blog.id)
   }
 
   const blogStyle = {
@@ -19,14 +29,14 @@ const Blog = ({blog}) => {
   const blogDetails = () => (
     <>
       <div>{blog.url}</div>
-      <div>likes {blog.likes} <button>like</button></div>
+      <div>likes {blog.likes} <button onClick={addLike}>like</button></div>
       <div>{blog.user.name}</div>
     </>
   )
   
   return (
     <div style={blogStyle}>
-      {blog.title} {blog.author}{' '}
+      {blog.title} {blog.author} {' '}
       <button onClick={toggleVisibility}>{visibility ? 'hide' : 'view'}</button>
       {visibility ? blogDetails() : ''}
     </div>  
