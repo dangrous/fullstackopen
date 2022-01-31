@@ -16,7 +16,7 @@ const App = () => {
   useEffect(() => {
     const getBlogList = async () => {
       const newList = await blogService.getAll()
-      setBlogs(newList.sort((a, b) => b.likes - a.likes))
+      setBlogs(newList)
     }
     getBlogList()
   }, [])
@@ -39,7 +39,7 @@ const App = () => {
         setNotification(null)
       }, 5000)
       const newList = await blogService.getAll()
-      setBlogs(newList.sort((a, b) => b.likes - a.likes))
+      setBlogs(newList)
     } catch (exception) {
       setNotification('Could not add the blog post')
       setTimeout(() => {
@@ -52,7 +52,7 @@ const App = () => {
     try {
       await blogService.update(blogObject, blogId)
       const newList = await blogService.getAll()
-      setBlogs(newList.sort((a, b) => b.likes - a.likes))
+      setBlogs(newList)
     } catch (exception) {
       setNotification(`Could not add the like to "${blogObject.title}"`)
       setTimeout(() => {
