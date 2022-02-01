@@ -18,6 +18,7 @@ const Blog = ({blog, updateBlog, removeBlog, username}) => {
   }
 
   const deleteBlog = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`))
     removeBlog(blog.id)
   }
 
