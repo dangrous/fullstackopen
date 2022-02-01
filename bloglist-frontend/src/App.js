@@ -61,6 +61,23 @@ const App = () => {
     }
   }
 
+  const removeBlog = async(blogId) => {
+    try {
+      await blogService.remove(blogId)
+      const newList = await blogService.getAll()
+      setNotification(`Removed blog post`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000) 
+      setBlogs(newList)
+    } catch (exception) {
+      setNotification(`Could not remove blog post`)
+      setTimeout(() => {
+        setNotification(null)
+      }, 5000)  
+    }
+  }
+
   const handleLogin = async (event) => {
     event.preventDefault()
 
@@ -146,7 +163,7 @@ const App = () => {
       <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
       {blogForm()}
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog} username={user.username} />
       )}
     </div>
   )
