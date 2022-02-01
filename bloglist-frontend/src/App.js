@@ -65,16 +65,16 @@ const App = () => {
     try {
       await blogService.remove(blogId)
       const newList = await blogService.getAll()
-      setNotification(`Removed blog post`)
+      setNotification('Removed blog post')
       setTimeout(() => {
         setNotification(null)
-      }, 5000) 
+      }, 5000)
       setBlogs(newList)
     } catch (exception) {
-      setNotification(`Could not remove blog post`)
+      setNotification('Could not remove blog post')
       setTimeout(() => {
         setNotification(null)
-      }, 5000)  
+      }, 5000)
     }
   }
 
@@ -89,7 +89,7 @@ const App = () => {
       window.localStorage.setItem(
         'loggedBlogappUser', JSON.stringify(user)
       )
-        
+
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -113,9 +113,9 @@ const App = () => {
     setUser(null)
 
     setNotification('Logged out')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+    setTimeout(() => {
+      setNotification(null)
+    }, 5000)
   }
 
   const blogFormRef = useRef()
@@ -128,7 +128,8 @@ const App = () => {
         <form onSubmit={handleLogin}>
           <div>
             username
-              <input
+            {' '}
+            <input
               type="text"
               value={username}
               name="Username"
@@ -137,7 +138,8 @@ const App = () => {
           </div>
           <div>
             password
-              <input
+            {' '}
+            <input
               type="password"
               value={password}
               name="Password"
@@ -145,17 +147,17 @@ const App = () => {
             />
           </div>
           <button type="submit">login</button>
-      </form>
+        </form>
       </div>
     )
   }
 
-  const blogForm = () => (    
+  const blogForm = () => (
     <Togglable buttonLabel='create new blog' ref={blogFormRef}>
       <BlogForm createBlog={addBlog} />
     </Togglable>
   )
-  
+
   return (
     <div>
       <h2>blogs</h2>

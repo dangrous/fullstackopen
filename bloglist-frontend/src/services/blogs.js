@@ -12,7 +12,7 @@ const getAll = async () => {
   return blogPosts.data.sort((a, b) => b.likes - a.likes)
 }
 
-const create = async newObject => {  
+const create = async newObject => {
   const config = {
     headers: { Authorization: token },
   }
@@ -22,7 +22,7 @@ const create = async newObject => {
 }
 
 const update = async (blogObject, blogId) => {
-  const response = await axios.put(baseUrl+"/"+blogId, blogObject)
+  const response = await axios.put(baseUrl+'/'+blogId, blogObject)
   return response.data
 }
 
@@ -31,7 +31,7 @@ const remove = async(blogId) => {
     headers: { Authorization: token },
   }
 
-  const response = await axios.delete(baseUrl+"/"+blogId, config)
+  const response = await axios.delete(baseUrl+'/'+blogId, config)
   return response.data
 }
 
