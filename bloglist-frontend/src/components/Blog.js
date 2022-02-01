@@ -1,4 +1,5 @@
 import React, {useState} from 'react'
+import PropTypes from 'prop-types'
 
 const Blog = ({blog, updateBlog, removeBlog, username}) => {
   const [visibility, setVisibility] = useState(false)
@@ -18,8 +19,9 @@ const Blog = ({blog, updateBlog, removeBlog, username}) => {
   }
 
   const deleteBlog = () => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`))
-    removeBlog(blog.id)
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      removeBlog(blog.id)
+    }
   }
 
   const blogStyle = {
@@ -50,6 +52,13 @@ const Blog = ({blog, updateBlog, removeBlog, username}) => {
       {visibility ? blogDetails() : ''}
     </div>  
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  updateBlog: PropTypes.func.isRequired,
+  removeBlog: PropTypes.func.isRequired,
+  username: PropTypes.string.isRequired
 }
 
 export default Blog
