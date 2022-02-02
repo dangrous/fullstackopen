@@ -29,6 +29,7 @@ describe('<BlogForm /> component', () => {
     fireEvent.submit(form)
 
     expect(createBlog.mock.calls).toHaveLength(1)
+    expect(createBlog.mock.calls[0]).toHaveLength(1)
     expect(createBlog.mock.calls[0][0].title).toBe('testing a title here')
     expect(createBlog.mock.calls[0][0].author).toBe('testing author')
     expect(createBlog.mock.calls[0][0].url).toBe('http://example.com')
