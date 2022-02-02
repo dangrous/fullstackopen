@@ -6,6 +6,8 @@ import Blog from './Blog'
 describe('<Blog /> component', () => {
   let component
 
+  const addMockLike = jest.fn()
+
   beforeEach(() => {
     const blog = {
       title: 'This is a blog title',
@@ -19,7 +21,7 @@ describe('<Blog /> component', () => {
       <Blog
         blog={blog}
         username='tester'
-        updateBlog={() => 0}
+        updateBlog={addMockLike}
         removeBlog={() => 0}
       />
     )
@@ -40,5 +42,17 @@ describe('<Blog /> component', () => {
     expect(component.container).toHaveTextContent('Testing Author')
     expect(component.container).toHaveTextContent('http://www.example.com')
     expect(component.container).toHaveTextContent('69420')
+  })
+
+  test('clicking the like button increases the like count each time', () => {
+    const viewButton = component.getByText('view')
+    fireEvent.click(viewButton)
+
+    const likeButton = component.getByText('like')
+    fireEvent.click(likeButton)
+    expect(addMockLike.mock.calls).toHaveLength(1)
+
+    fireEvent.click(likeButton)
+    expect(addMockLike.mock.calls).toHaveLength(2)
   })
 })
