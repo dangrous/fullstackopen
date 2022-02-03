@@ -9,13 +9,16 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
   }
 
   const addLike = () => {
-    updateBlog({
-      user: blog.user.id,
-      likes: blog.likes + 1,
-      author: blog.author,
-      title: blog.title,
-      url: blog.url
-    }, blog.id)
+    updateBlog(
+      {
+        user: blog.user.id,
+        likes: blog.likes + 1,
+        author: blog.author,
+        title: blog.title,
+        url: blog.url,
+      },
+      blog.id
+    )
   }
 
   const deleteBlog = () => {
@@ -29,25 +32,25 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   }
 
   const blogDetails = () => (
     <>
       <div>{blog.url}</div>
-      <div>likes {blog.likes} <button onClick={addLike}>like</button></div>
+      <div>
+        likes {blog.likes} <button onClick={addLike}>like</button>
+      </div>
       <div>{blog.user.name}</div>
       {username === blog.user.username ? removeButton() : ''}
     </>
   )
 
-  const removeButton = () => (
-    <button onClick={deleteBlog}>remove</button>
-  )
+  const removeButton = () => <button onClick={deleteBlog}>remove</button>
 
   return (
     <div style={blogStyle} className='blog'>
-      {blog.title} {blog.author} {' '}
+      {blog.title} {blog.author}{' '}
       <button onClick={toggleVisibility}>{visibility ? 'hide' : 'view'}</button>
       {visibility ? blogDetails() : ''}
     </div>
@@ -58,7 +61,7 @@ Blog.propTypes = {
   blog: PropTypes.object.isRequired,
   updateBlog: PropTypes.func.isRequired,
   removeBlog: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired
+  username: PropTypes.string.isRequired,
 }
 
 export default Blog
