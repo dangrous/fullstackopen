@@ -34,7 +34,9 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     try {
       await blogService.create(blogObject)
-      setNotification(`Added a new blog, "${blogObject.title}" by ${blogObject.author}`)
+      setNotification(
+        `Added a new blog, "${blogObject.title}" by ${blogObject.author}`
+      )
       setTimeout(() => {
         setNotification(null)
       }, 5000)
@@ -61,7 +63,7 @@ const App = () => {
     }
   }
 
-  const removeBlog = async(blogId) => {
+  const removeBlog = async (blogId) => {
     try {
       await blogService.remove(blogId)
       const newList = await blogService.getAll()
@@ -83,12 +85,11 @@ const App = () => {
 
     try {
       const user = await loginService.login({
-        username, password,
+        username,
+        password,
       })
 
-      window.localStorage.setItem(
-        'loggedBlogappUser', JSON.stringify(user)
-      )
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
 
       blogService.setToken(user.token)
       setUser(user)
@@ -127,26 +128,28 @@ const App = () => {
         <Notification notification={notification} />
         <form onSubmit={handleLogin}>
           <div>
-            username
-            {' '}
+            username{' '}
             <input
-              type="text"
+              id='username'
+              type='text'
               value={username}
-              name="Username"
+              name='Username'
               onChange={({ target }) => setUsername(target.value)}
             />
           </div>
           <div>
-            password
-            {' '}
+            password{' '}
             <input
-              type="password"
+              id='password'
+              type='password'
               value={password}
-              name="Password"
+              name='Password'
               onChange={({ target }) => setPassword(target.value)}
             />
           </div>
-          <button type="submit">login</button>
+          <button id='login-button' type='submit'>
+            login
+          </button>
         </form>
       </div>
     )
@@ -162,11 +165,19 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification notification={notification} />
-      <p>{user.name} logged in<button onClick={handleLogout}>logout</button></p>
+      <p>
+        {user.name} logged in<button onClick={handleLogout}>logout</button>
+      </p>
       {blogForm()}
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} removeBlog={removeBlog} username={user.username} />
-      )}
+      {blogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          updateBlog={updateBlog}
+          removeBlog={removeBlog}
+          username={user.username}
+        />
+      ))}
     </div>
   )
 }
