@@ -40,13 +40,7 @@ describe('Blog app', function () {
 
   describe('When logged in', function () {
     beforeEach(function () {
-      cy.request('POST', 'http://localhost:3003/api/login', {
-        username: 'cypress',
-        password: 'cypresstesting',
-      }).then(({ body }) => {
-        localStorage.setItem('loggedBlogappUser', JSON.stringify(body))
-        cy.visit('http://localhost:3000')
-      })
+      cy.login({ username: 'cypress', password: 'cypresstesting' })
     })
 
     it('A blog can be created', function () {
@@ -61,11 +55,11 @@ describe('Blog app', function () {
     })
 
     it('A blog can be liked', function () {
-      cy.contains('create new blog').click()
-      cy.get('#title').type('A cypress blog title')
-      cy.get('#author').type('A cypress author')
-      cy.get('#url').type('google.com')
-      cy.get('#blog-button').click()
+      cy.createBlog({
+        title: 'A cypress blog title',
+        author: 'A cypress author',
+        url: 'google.com',
+      })
 
       cy.contains('view').click()
       cy.contains('likes 0')
@@ -74,11 +68,11 @@ describe('Blog app', function () {
     })
 
     it('The user who created a blog can delete it', function () {
-      cy.contains('create new blog').click()
-      cy.get('#title').type('A cypress blog title')
-      cy.get('#author').type('A cypress author')
-      cy.get('#url').type('google.com')
-      cy.get('#blog-button').click()
+      cy.createBlog({
+        title: 'A cypress blog title',
+        author: 'A cypress author',
+        url: 'google.com',
+      })
 
       cy.contains('view').click()
       cy.contains('remove').click()
@@ -86,12 +80,12 @@ describe('Blog app', function () {
       cy.should('not.contain', 'A cypress blog title')
     })
 
-    it.only('A user who did not create a blog cannot delete it', function () {
-      cy.contains('create new blog').click()
-      cy.get('#title').type('A cypress blog title')
-      cy.get('#author').type('A cypress author')
-      cy.get('#url').type('google.com')
-      cy.get('#blog-button').click()
+    it('A user who did not create a blog cannot delete it', function () {
+      cy.createBlog({
+        title: 'A cypress blog title',
+        author: 'A cypress author',
+        url: 'google.com',
+      })
 
       cy.contains('A cypress blog title')
       cy.contains('A cypress author')
@@ -107,18 +101,52 @@ describe('Blog app', function () {
 
       cy.contains('logout').click()
 
-      cy.request('POST', 'http://localhost:3003/api/login', {
-        username: 'cypress2',
-        password: 'cypresstesting2',
-      }).then(({ body }) => {
-        localStorage.setItem('loggedBlogappUser', JSON.stringify(body))
-        cy.visit('http://localhost:3000')
-      })
+      cy.login({ username: 'cypress2', password: 'cypresstesting2' })
 
       cy.contains('A cypress blog title')
       cy.contains('A cypress author')
       cy.contains('view').click()
       cy.should('not.contain', 'remove')
+    })
+
+    it('Orders blog posts correctly by like count', function () {
+      cy.createBlog({
+        title: 'A first cypress blog title',
+        author: 'A first cypress author',
+        url: 'google.com',
+      })
+
+      cy.createBlog({
+        title: 'A second cypress blog title',
+        author: 'A second cypress author',
+        url: 'google.com',
+      })
+
+      cy.createBlog({
+        title: 'A third cypress blog title',
+        author: 'A third cypress author',
+        url: 'google.com',
+      })
+
+      cy.get('.blog').each(($blog, index) => {
+        cy.wrap($blog).find('.view-button').click()
+        const wordsBefore = ['first', 'second', 'third']
+        cy.wrap($blog).contains('likes 0')
+        cy.wrap($blog).contains(`A ${wordsBefore[index]} cypress blog title`)
+      })
+
+      cy.get('.blog').each(($blog, index) => {
+        for (let i = 0; i <= index; i++) {
+          cy.wrap($blog).find('.like-button').click()
+          cy.wrap($blog).contains(`likes ${i + 1}`)
+        }
+      })
+
+      cy.get('.blog').each(($blog, index) => {
+        const wordsAfter = ['third', 'second', 'first']
+        cy.wrap($blog).contains(`likes ${3 - index}`)
+        cy.wrap($blog).contains(`A ${wordsAfter[index]} cypress blog title`)
+      })
     })
   })
 })
