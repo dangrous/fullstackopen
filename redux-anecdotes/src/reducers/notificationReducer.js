@@ -1,4 +1,4 @@
-const initialState = 'initial notification'
+const initialState = ''
 
 export const setNotification = (content) => {
   return {
