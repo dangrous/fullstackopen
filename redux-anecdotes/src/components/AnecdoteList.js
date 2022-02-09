@@ -20,7 +20,13 @@ const Anecdote = ({ anecdote, handleClick }) => {
 
 const AnecdoteList = () => {
   const dispatch = useDispatch()
-  const anecdotes = useSelector((state) => state.anecdotes)
+  const anecdotes = useSelector((state) => {
+    if (!state.filter) {
+      return state.anecdotes
+    }
+    const regexp = new RegExp(state.filter)
+    return state.anecdotes.filter((anecdote) => regexp.test(anecdote.content))
+  })
   anecdotes.sort((a, b) => b.votes - a.votes)
 
   const vote = (anecdote) => {
