@@ -8,6 +8,7 @@ const Filter = () => {
     // input-field value is in variable event.target.value
     dispatch(setFilter(event.target.value))
   }
+
   const style = {
     marginBottom: 10,
   }
