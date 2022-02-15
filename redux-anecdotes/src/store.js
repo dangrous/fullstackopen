@@ -1,4 +1,3 @@
-import thunk from 'redux-thunk'
 import { configureStore } from '@reduxjs/toolkit'
 
 import anecdoteReducer from './reducers/anecdoteReducer'
@@ -11,7 +10,6 @@ const store = configureStore({
     notification: notificationReducer,
     filter: filterReducer,
   },
-  middleware: [thunk],
 })
 
 export default store
