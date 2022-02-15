@@ -14,15 +14,16 @@ const anecdoteSlice = createSlice({
         ...anecdoteToChange,
         votes: anecdoteToChange.votes + 1,
       }
-      return state.map((anecdote) =>
-        anecdote.id !== id ? anecdote : changedAnecdote
-      )
+      return state
+        .map((anecdote) => (anecdote.id !== id ? anecdote : changedAnecdote))
+        .sort((a, b) => b.votes - a.votes)
     },
     appendAnecdote(state, action) {
       state.push(action.payload)
+      state.sort((a, b) => b.votes - a.votes)
     },
     setAnecdotes(state, action) {
-      return action.payload
+      return action.payload.sort((a, b) => b.votes - a.votes)
     },
   },
 })
