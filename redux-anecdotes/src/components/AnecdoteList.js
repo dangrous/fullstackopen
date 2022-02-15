@@ -21,13 +21,12 @@ const Anecdote = ({ anecdote, handleClick }) => {
 const AnecdoteList = () => {
   const timerRef = useRef(null)
   const dispatch = useDispatch()
-  const anecdotes = useSelector(({ anecdotes }) => {
-    return [...anecdotes]
-    // if (!state.filter) {
-    //   return state.anecdotes
-    // }
-    // const regexp = new RegExp(state.filter)
-    // return state.anecdotes.filter((anecdote) => regexp.test(anecdote.content))
+  const anecdotes = useSelector(({ anecdotes, filter }) => {
+    if (!filter) {
+      return [...anecdotes]
+    }
+    const regexp = new RegExp(filter)
+    return anecdotes.filter((anecdote) => regexp.test(anecdote.content))
   })
   anecdotes.sort((a, b) => b.votes - a.votes)
 
