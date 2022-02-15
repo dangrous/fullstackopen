@@ -1,5 +1,5 @@
-import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { useRef } from 'react'
 import { voteForAnecdote } from '../reducers/anecdoteReducer'
 import {
   clearNotification,
@@ -19,6 +19,7 @@ const Anecdote = ({ anecdote, handleClick }) => {
 }
 
 const AnecdoteList = () => {
+  const timerRef = useRef(null)
   const dispatch = useDispatch()
   const anecdotes = useSelector(({ anecdotes }) => {
     return [...anecdotes]
@@ -32,8 +33,9 @@ const AnecdoteList = () => {
 
   const vote = (anecdote) => {
     dispatch(voteForAnecdote(anecdote.id))
+    clearTimeout(timerRef.current)
     dispatch(setNotification(`you voted for '${anecdote.content}'`))
-    setTimeout(() => {
+    timerRef.current = setTimeout(() => {
       dispatch(clearNotification())
     }, 5000)
   }
