@@ -3,7 +3,7 @@ Content-Type: application/json
 
 {
   "notes": [],
-  "username": "bettertest",
-  "name": "Superuser",
-  "password": "bettertest"
+  "username": "testing",
+  "name": "Testing Account",
+  "password": "testing"
 }
