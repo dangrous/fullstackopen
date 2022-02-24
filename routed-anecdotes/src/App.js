@@ -1,5 +1,11 @@
 import { useState } from 'react'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useMatch,
+} from 'react-router-dom'
 
 const Menu = () => {
   const padding = {
@@ -25,7 +31,9 @@ const AnecdoteList = ({ anecdotes }) => (
     <h2>Anecdotes</h2>
     <ul>
       {anecdotes.map((anecdote) => (
-        <li key={anecdote.id}>{anecdote.content}</li>
+        <li key={anecdote.id}>
+          <Link to={`/anecdotes/${anecdote.id}`}>{anecdote.content}</Link>
+        </li>
       ))}
     </ul>
   </div>
@@ -113,7 +121,23 @@ const CreateNew = (props) => {
   )
 }
 
-const App = () => {
+const Anecdote = ({ anecdote }) => {
+  return (
+    <div>
+      <h2>
+        {anecdote.content} by {anecdote.author}
+      </h2>
+      <p>
+        has {anecdote.votes} {anecdote.votes === 1 ? 'vote' : 'votes'}
+      </p>
+      <p>
+        for more info see <a href={anecdote.info}>{anecdote.info}</a>
+      </p>
+    </div>
+  )
+}
+
+const RoutedApp = () => {
   const [anecdotes, setAnecdotes] = useState([
     {
       content: 'If it hurts, do it more often',
@@ -131,10 +155,15 @@ const App = () => {
     },
   ])
 
+  const match = useMatch('/anecdotes/:id')
+  const anecdote = match
+    ? anecdotes.find((a) => a.id === Number(match.params.id))
+    : null
+
   const [notification, setNotification] = useState('')
 
   const addNew = (anecdote) => {
-    anecdote.id = (Math.random() * 10000).toFixed(0)
+    anecdote.id = Number((Math.random() * 10000).toFixed(0))
     setAnecdotes(anecdotes.concat(anecdote))
   }
 
@@ -153,17 +182,27 @@ const App = () => {
 
   return (
     <div>
-      <Router>
-        <h1>Software anecdotes</h1>
-        <Menu />
-        <Routes>
-          <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
-          <Route path='/about' element={<About />} />
-          <Route path='/create' element={<CreateNew addNew={addNew} />} />
-        </Routes>
-      </Router>
+      <h1>Software anecdotes</h1>
+      <Menu />
+      <Routes>
+        <Route path='/' element={<AnecdoteList anecdotes={anecdotes} />} />
+        <Route path='/about' element={<About />} />
+        <Route path='/create' element={<CreateNew addNew={addNew} />} />
+        <Route
+          path='/anecdotes/:id'
+          element={<Anecdote anecdote={anecdote} />}
+        />
+      </Routes>
       <Footer />
     </div>
+  )
+}
+
+const App = () => {
+  return (
+    <Router>
+      <RoutedApp />
+    </Router>
   )
 }
 
