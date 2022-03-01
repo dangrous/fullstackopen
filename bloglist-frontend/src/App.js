@@ -7,7 +7,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs } from './reducers/blogReducer'
+import { initializeBlogs, updateBlog } from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -30,18 +30,6 @@ const App = () => {
       blogService.setToken(user.token)
     }
   }, [])
-
-  const updateBlog = async (blogObject, blogId) => {
-    try {
-      await blogService.update(blogObject, blogId)
-      const newList = await blogService.getAll()
-      // setBlogs(newList)
-    } catch (exception) {
-      dispatch(
-        setNotification(`Could not add the like to "${blogObject.title}"`, 5)
-      )
-    }
-  }
 
   const removeBlog = async (blogId) => {
     try {
@@ -135,13 +123,7 @@ const App = () => {
       </p>
       {blogForm()}
       {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          updateBlog={updateBlog}
-          removeBlog={removeBlog}
-          username={user.username}
-        />
+        <Blog key={blog.id} blog={blog} username={user.username} />
       ))}
     </div>
   )

@@ -1,7 +1,12 @@
 import React, { useState } from 'react'
 import PropTypes from 'prop-types'
+import { updateBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
+import { deleteBlog } from '../reducers/blogReducer'
+import { useDispatch } from 'react-redux'
 
-const Blog = ({ blog, updateBlog, removeBlog, username }) => {
+const Blog = ({ blog, username }) => {
+  const dispatch = useDispatch()
   const [visibility, setVisibility] = useState(false)
 
   const toggleVisibility = () => {
@@ -9,21 +14,21 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
   }
 
   const addLike = () => {
-    updateBlog(
-      {
-        user: blog.user.id,
-        likes: blog.likes + 1,
-        author: blog.author,
-        title: blog.title,
-        url: blog.url,
-      },
-      blog.id
-    )
+    try {
+      dispatch(updateBlog(blog.id))
+    } catch (exception) {
+      dispatch(setNotification(`Could not add the like to "${blog.title}"`, 5))
+    }
   }
 
-  const deleteBlog = () => {
+  const removeBlog = () => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      removeBlog(blog.id)
+      try {
+        dispatch(deleteBlog(blog.id))
+        dispatch(setNotification('Removed blog post', 5))
+      } catch {
+        dispatch(setNotification('Could not remove blog post', 5))
+      }
     }
   }
 
@@ -49,7 +54,7 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
     </>
   )
 
-  const removeButton = () => <button onClick={deleteBlog}>remove</button>
+  const removeButton = () => <button onClick={removeBlog}>remove</button>
 
   return (
     <div style={blogStyle} className='blog'>
@@ -64,8 +69,6 @@ const Blog = ({ blog, updateBlog, removeBlog, username }) => {
 
 Blog.propTypes = {
   blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
   username: PropTypes.string.isRequired,
 }
 

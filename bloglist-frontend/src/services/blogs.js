@@ -13,6 +13,11 @@ const getAll = async () => {
   return blogPosts.data.sort((a, b) => b.likes - a.likes)
 }
 
+const getOne = async (id) => {
+  const response = await axios.get(baseUrl + `/${id}`)
+  return response.data
+}
+
 const create = async (newObject) => {
   const config = {
     headers: { Authorization: token },
@@ -38,6 +43,7 @@ const remove = async (blogId) => {
 
 const blogService = {
   getAll,
+  getOne,
   create,
   setToken,
   update,
