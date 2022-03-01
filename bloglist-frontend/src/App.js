@@ -7,40 +7,29 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs, updateBlog } from './reducers/blogReducer'
+import { initializeBlogs } from './reducers/blogReducer'
+import { login, logout } from './reducers/userReducer'
 
 const App = () => {
   const dispatch = useDispatch()
-  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
 
   useEffect(() => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
   const blogs = useSelector((state) => state.blogs)
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(login(user))
       blogService.setToken(user.token)
     }
   }, [])
-
-  const removeBlog = async (blogId) => {
-    try {
-      await blogService.remove(blogId)
-      const newList = await blogService.getAll()
-      dispatch(setNotification('Removed blog post', 5))
-      // setBlogs(newList)
-    } catch (exception) {
-      dispatch(setNotification('Could not remove blog post', 5))
-    }
-  }
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -54,7 +43,7 @@ const App = () => {
       window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
 
       blogService.setToken(user.token)
-      setUser(user)
+      dispatch(login(user))
       setUsername('')
       setPassword('')
       dispatch(setNotification('Logged in', 3))
@@ -67,7 +56,7 @@ const App = () => {
     event.preventDefault()
 
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    dispatch(logout())
 
     dispatch(setNotification('Logged out', 5))
   }

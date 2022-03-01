@@ -26,7 +26,7 @@ const Blog = ({ blog, username }) => {
       try {
         dispatch(deleteBlog(blog.id))
         dispatch(setNotification('Removed blog post', 5))
-      } catch {
+      } catch (exception) {
         dispatch(setNotification('Could not remove blog post', 5))
       }
     }
