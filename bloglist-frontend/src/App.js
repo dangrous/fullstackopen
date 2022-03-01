@@ -5,10 +5,12 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import { useDispatch } from 'react-redux'
+import { setNotification } from './reducers/notificationReducer'
 
 const App = () => {
+  const dispatch = useDispatch()
   const [blogs, setBlogs] = useState([])
-  const [notification, setNotification] = useState(null)
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -34,19 +36,17 @@ const App = () => {
     blogFormRef.current.toggleVisibility()
     try {
       await blogService.create(blogObject)
-      setNotification(
-        `Added a new blog, "${blogObject.title}" by ${blogObject.author}`
+      dispatch(
+        setNotification(
+          `Added a new blog, "${blogObject.title}" by ${blogObject.author}`,
+          5
+        )
       )
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+
       const newList = await blogService.getAll()
       setBlogs(newList)
     } catch (exception) {
-      setNotification('Could not add the blog post')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(setNotification('Could not add the blog post', 5))
     }
   }
 
@@ -56,10 +56,9 @@ const App = () => {
       const newList = await blogService.getAll()
       setBlogs(newList)
     } catch (exception) {
-      setNotification(`Could not add the like to "${blogObject.title}"`)
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(
+        setNotification(`Could not add the like to "${blogObject.title}"`, 5)
+      )
     }
   }
 
@@ -67,16 +66,10 @@ const App = () => {
     try {
       await blogService.remove(blogId)
       const newList = await blogService.getAll()
-      setNotification('Removed blog post')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(setNotification('Removed blog post', 5))
       setBlogs(newList)
     } catch (exception) {
-      setNotification('Could not remove blog post')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(setNotification('Could not remove blog post', 5))
     }
   }
 
@@ -95,15 +88,9 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      setNotification('Logged in')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(setNotification('Logged in', 3))
     } catch (exception) {
-      setNotification('Wrong username or password')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
+      dispatch(setNotification('Wrong username or password', 5))
     }
   }
 
@@ -113,10 +100,7 @@ const App = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
 
-    setNotification('Logged out')
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
+    dispatch(setNotification('Logged out', 5))
   }
 
   const blogFormRef = useRef()
@@ -125,7 +109,7 @@ const App = () => {
     return (
       <div>
         <h2>Log in to application</h2>
-        <Notification notification={notification} />
+        <Notification />
         <form onSubmit={handleLogin}>
           <div>
             username{' '}
@@ -164,7 +148,7 @@ const App = () => {
   return (
     <div>
       <h2>blogs</h2>
-      <Notification notification={notification} />
+      <Notification />
       <p>
         {user.name} logged in<button onClick={handleLogout}>logout</button>
       </p>
