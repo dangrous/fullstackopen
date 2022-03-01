@@ -9,6 +9,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
 import { initializeBlogs } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import userService from './services/users'
 
 const App = () => {
   const dispatch = useDispatch()
@@ -19,7 +21,6 @@ const App = () => {
     dispatch(initializeBlogs())
   }, [dispatch])
 
-  const blogs = useSelector((state) => state.blogs)
   const user = useSelector((state) => state.user)
 
   useEffect(() => {
@@ -61,8 +62,6 @@ const App = () => {
     dispatch(setNotification('Logged out', 5))
   }
 
-  const blogFormRef = useRef()
-
   if (user === null) {
     return (
       <div>
@@ -97,6 +96,35 @@ const App = () => {
     )
   }
 
+  return (
+    <div>
+      <h2>blogs</h2>
+      <Notification />
+      <p>
+        {user.name} logged in<button onClick={handleLogout}>logout</button>
+      </p>
+      <Router>
+        <Routes>
+          <Route path='/' element={<Main />} />
+          <Route path='/users' element={<Users />} />
+        </Routes>
+      </Router>
+    </div>
+  )
+}
+
+const Main = () => {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(initializeBlogs())
+  }, [dispatch])
+
+  const user = useSelector((state) => state.user)
+
+  const blogs = useSelector((state) => state.blogs)
+  const blogFormRef = useRef()
+
   const blogForm = () => (
     <Togglable buttonLabel='create new blog' ref={blogFormRef}>
       <BlogForm />
@@ -105,11 +133,6 @@ const App = () => {
 
   return (
     <div>
-      <h2>blogs</h2>
-      <Notification />
-      <p>
-        {user.name} logged in<button onClick={handleLogout}>logout</button>
-      </p>
       {blogForm()}
       {blogs.map((blog) => (
         <Blog key={blog.id} blog={blog} username={user.username} />
@@ -117,5 +140,57 @@ const App = () => {
     </div>
   )
 }
+
+const Users = () => {
+  const [users, setUsers] = useState([])
+
+  const getUsers = async () => {
+    const users = await userService.getAll()
+    setUsers(users)
+  }
+
+  useEffect(() => {
+    getUsers()
+  }, [])
+
+  return (
+    <div>
+      <h2>Users</h2>
+      <table>
+        <thead>
+          <tr>
+            <th></th>
+            <th>blogs created</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user) => (
+            <tr key={user.id}>
+              <td>{user.name}</td>
+              <td>{user.blogs.length}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  )
+}
+
+// const RoutedApp = () => {
+//   return (
+//     <div>
+//       <Routes>
+//         <Route path='/' element={<Main />} />
+//         <Route path='/users' element={<Users />} />
+//       </Routes>
+//     </div>
+//   )
+// }
+
+// const App = () => (
+//   <Router>
+//     <RoutedApp />
+//   </Router>
+// )
 
 export default App
