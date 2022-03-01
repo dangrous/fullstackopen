@@ -5,23 +5,22 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import blogService from './services/blogs'
 import loginService from './services/login'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs } from './reducers/blogReducer'
 
 const App = () => {
   const dispatch = useDispatch()
-  const [blogs, setBlogs] = useState([])
+  // const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   useEffect(() => {
-    const getBlogList = async () => {
-      const newList = await blogService.getAll()
-      setBlogs(newList)
-    }
-    getBlogList()
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
+
+  const blogs = useSelector((state) => state.blogs)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -32,29 +31,11 @@ const App = () => {
     }
   }, [])
 
-  const addBlog = async (blogObject) => {
-    blogFormRef.current.toggleVisibility()
-    try {
-      await blogService.create(blogObject)
-      dispatch(
-        setNotification(
-          `Added a new blog, "${blogObject.title}" by ${blogObject.author}`,
-          5
-        )
-      )
-
-      const newList = await blogService.getAll()
-      setBlogs(newList)
-    } catch (exception) {
-      dispatch(setNotification('Could not add the blog post', 5))
-    }
-  }
-
   const updateBlog = async (blogObject, blogId) => {
     try {
       await blogService.update(blogObject, blogId)
       const newList = await blogService.getAll()
-      setBlogs(newList)
+      // setBlogs(newList)
     } catch (exception) {
       dispatch(
         setNotification(`Could not add the like to "${blogObject.title}"`, 5)
@@ -67,7 +48,7 @@ const App = () => {
       await blogService.remove(blogId)
       const newList = await blogService.getAll()
       dispatch(setNotification('Removed blog post', 5))
-      setBlogs(newList)
+      // setBlogs(newList)
     } catch (exception) {
       dispatch(setNotification('Could not remove blog post', 5))
     }
@@ -141,7 +122,7 @@ const App = () => {
 
   const blogForm = () => (
     <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-      <BlogForm createBlog={addBlog} />
+      <BlogForm />
     </Togglable>
   )
 
