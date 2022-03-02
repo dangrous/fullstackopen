@@ -7,6 +7,7 @@ import { useMatch, useNavigate } from 'react-router-dom'
 import blogService from '../services/blogs'
 import userService from '../services/users'
 import Comments from './Comments'
+import { Button } from 'react-bootstrap'
 
 const Blog = () => {
   const navigate = useNavigate()
@@ -49,7 +50,11 @@ const Blog = () => {
     }
   }
 
-  const removeButton = () => <button onClick={removeBlog}>remove</button>
+  const removeButton = () => (
+    <Button className='mt-1' onClick={removeBlog}>
+      remove
+    </Button>
+  )
 
   if (!blog) {
     return null
@@ -57,17 +62,23 @@ const Blog = () => {
 
   return (
     <div>
-      <h2>
-        {blog.title} {blog.author}
-      </h2>
-      <a href={blog.url}>{blog.url}</a>
-      <div>
+      <h2>{blog.title}</h2>
+      <p className='fst-italic fw-light'>{blog.author}</p>
+      URL: <a href={blog.url}>{blog.url}</a>
+      <div className='fw-bold mt-1'>
         {blog.likes} {blog.likes === 1 ? 'like' : 'likes'}
-        <button className='like-button' onClick={addLike}>
+        <Button
+          className='like-button ms-1 p-1'
+          size='sm'
+          variant='outline-primary'
+          onClick={addLike}
+        >
           like
-        </button>
+        </Button>
       </div>
-      <div>added by {blog.user.name}</div>
+      <div>
+        added by <em>{blog.user.name}</em>
+      </div>
       {blog.user.username === user.username ? removeButton() : null}
       <Comments blog={blog} />
     </div>

@@ -1,9 +1,10 @@
 import React from 'react'
 import { connect } from 'react-redux'
+import { Alert } from 'react-bootstrap'
 
 const Notification = ({ notification }) => {
   if (notification) {
-    return <div className='error'>{notification}</div>
+    return <Alert variant='success'>{notification}</Alert>
   }
   return null
 }

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { Button, Navbar, Nav } from 'react-bootstrap'
 
 import Blog from './components/Blog'
 import BlogList from './components/BlogList'
@@ -44,31 +45,44 @@ const RoutedApp = () => {
 
   if (user === null) {
     return (
-      <div>
-        <h2>Log in to application</h2>
+      <div className='container'>
+        <h2 className='mt-3'>Log in to application</h2>
         <Notification />
         <LoginForm />
       </div>
     )
   }
 
-  const padding = {
-    padding: 5,
-  }
-
   return (
-    <div>
-      <div style={{ backgroundColor: '#ddd', padding: 5 }}>
-        <Link style={padding} to='/'>
-          blogs
-        </Link>
-        <Link style={padding} to='/users/'>
-          users
-        </Link>
-        <span style={padding}>{user.name} logged in</span>
-        <button onClick={handleLogout}>logout</button>
-      </div>
-      <h2>blogs</h2>
+    <div className='container'>
+      <Navbar
+        CollapseOnSelect
+        expand='lg'
+        bg='dark'
+        variant='dark'
+        className='p-1'
+      >
+        <Navbar.Toggle aria-controls='responsive-navbar-nav' />
+        <Navbar.Collapse id='responsive-navbar-nav'>
+          <Nav className='mr-auto'>
+            <Nav.Link href='#' as='span'>
+              <Link to='/'>All Blogs</Link>
+            </Nav.Link>
+            <Nav.Link href='#' as='span'>
+              <Link to='/users'>Users</Link>
+            </Nav.Link>
+            <Nav.Link href='#' as='span'>
+              <em className='me-1' style={{ color: '#fff' }}>
+                {user.name} <span style={{ color: '#ccc' }}>logged in</span>
+              </em>
+              <Button variant='secondary' size='sm' onClick={handleLogout}>
+                logout
+              </Button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+      <h1 className='mt-3'>Look at these great blogs!</h1>
       <Notification />
       <div></div>
       <Routes>

@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { connect } from 'react-redux'
 import { createBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
+import { Button, Form } from 'react-bootstrap'
 
 const BlogForm = (props) => {
   const addBlog = async (event) => {
@@ -28,23 +29,19 @@ const BlogForm = (props) => {
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input type='text' id='title' name='Title' />
-        </div>
-        <div>
-          author:
-          <input type='text' id='author' name='Author' />
-        </div>
-        <div>
-          url:
-          <input type='text' id='url' name='URL' />
-        </div>
-        <button id='blog-button' type='submit'>
-          create
-        </button>
-      </form>
+      <Form onSubmit={addBlog}>
+        <Form.Group>
+          <Form.Label>Title:</Form.Label>
+          <Form.Control type='text' id='title' name='Title' />
+          <Form.Label>Author:</Form.Label>
+          <Form.Control type='text' id='author' name='Author' />
+          <Form.Label>URL:</Form.Label>
+          <Form.Control type='text' id='url' name='URL' />
+          <Button className='mt-2' id='blog-button' type='submit'>
+            create
+          </Button>
+        </Form.Group>
+      </Form>
     </div>
   )
 }
