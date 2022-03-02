@@ -102,14 +102,25 @@ const RoutedApp = () => {
     )
   }
 
+  const padding = {
+    padding: 5,
+  }
+
   return (
     <div>
-      <h2>blogs</h2>
-      <Notification />
-      <p>{user.name} logged in</p>
-      <div>
+      <div style={{ backgroundColor: '#ddd', padding: 5 }}>
+        <Link style={padding} to='/'>
+          blogs
+        </Link>
+        <Link style={padding} to='/users/'>
+          users
+        </Link>
+        <span style={padding}>{user.name} logged in</span>
         <button onClick={handleLogout}>logout</button>
       </div>
+      <h2>blogs</h2>
+      <Notification />
+      <div></div>
       <Routes>
         <Route path='/' element={<Main />} />
         <Route path='/users' element={<Users />} />
@@ -264,9 +275,25 @@ const BlogPage = () => {
     return null
   }
 
+  const comments = (blog) => {
+    if (blog.comments.length < 1) {
+      return null
+    }
+    return (
+      <div>
+        <h3>comments</h3>
+        {blog.comments.map((comment, index) => (
+          <li key={index}>{comment}</li>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <div>
-      <h2>{blog.title}</h2>
+      <h2>
+        {blog.title} {blog.author}
+      </h2>
       <a href={blog.url}>{blog.url}</a>
       <div>
         {blog.likes} {blog.likes === 1 ? 'like' : 'likes'}
@@ -276,6 +303,7 @@ const BlogPage = () => {
       </div>
       <div>added by {blog.user.name}</div>
       {blog.user.username === user.username ? removeButton() : null}
+      {comments(blog)}
     </div>
   )
 }
