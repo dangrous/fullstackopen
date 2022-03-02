@@ -7,13 +7,13 @@ usersRouter.post('/', async (request, response) => {
 
   if (!body.password) {
     return response.status(400).json({
-      error: 'password is missing'
+      error: 'password is missing',
     })
   }
 
   if (body.password.length < 3) {
     return response.status(400).json({
-      error: 'password is too short'
+      error: 'password is too short',
     })
   }
 
@@ -32,9 +32,18 @@ usersRouter.post('/', async (request, response) => {
 })
 
 usersRouter.get('/', async (request, response) => {
-  const users = await User
-    .find({}).populate('blogs', { title: 1, author: 1, url: 1, likes: 1 })
+  const users = await User.find({}).populate('blogs', {
+    title: 1,
+    author: 1,
+    url: 1,
+    likes: 1,
+  })
   response.json(users)
+})
+
+usersRouter.get('/:id', async (request, response) => {
+  const user = await User.findById(request.params.id)
+  response.json(user)
 })
 
 module.exports = usersRouter

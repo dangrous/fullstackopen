@@ -33,7 +33,7 @@ const update = async (blogObject, blogId) => {
 }
 
 const comment = async (blogObject, blogId) => {
-  const response = await axios.put(
+  const response = await axios.post(
     baseUrl + '/' + blogId + '/comments',
     blogObject
   )

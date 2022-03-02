@@ -271,22 +271,15 @@ const BlogPage = () => {
 
   const removeButton = () => <button onClick={removeBlog}>remove</button>
 
-  if (!blog) {
-    return null
+  const addComment = async (e) => {
+    e.preventDefault()
+    const comment = e.target.comment.value
+    const updatedBlog = { ...blog, comments: blog.comments.concat(comment) }
+    await blogService.comment(updatedBlog, blog.id)
   }
 
-  const comments = (blog) => {
-    if (blog.comments.length < 1) {
-      return null
-    }
-    return (
-      <div>
-        <h3>comments</h3>
-        {blog.comments.map((comment, index) => (
-          <li key={index}>{comment}</li>
-        ))}
-      </div>
-    )
+  if (!blog) {
+    return null
   }
 
   return (
@@ -303,7 +296,16 @@ const BlogPage = () => {
       </div>
       <div>added by {blog.user.name}</div>
       {blog.user.username === user.username ? removeButton() : null}
-      {comments(blog)}
+      <div>
+        <h3>comments</h3>
+        <form onSubmit={addComment}>
+          <input type='text' name='comment'></input>
+          <button type='submit'>add comment</button>
+        </form>
+        {blog.comments.map((comment, index) => (
+          <li key={index}>{comment}</li>
+        ))}
+      </div>
     </div>
   )
 }
