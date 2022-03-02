@@ -9,10 +9,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
 import { initializeBlogs } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
-import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Link,
+  useMatch,
+} from 'react-router-dom'
 import userService from './services/users'
 
-const App = () => {
+const RoutedApp = () => {
   const dispatch = useDispatch()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -100,15 +106,50 @@ const App = () => {
     <div>
       <h2>blogs</h2>
       <Notification />
-      <p>
-        {user.name} logged in<button onClick={handleLogout}>logout</button>
-      </p>
-      <Router>
-        <Routes>
-          <Route path='/' element={<Main />} />
-          <Route path='/users' element={<Users />} />
-        </Routes>
-      </Router>
+      <p>{user.name} logged in</p>
+      <div>
+        <button onClick={handleLogout}>logout</button>
+      </div>
+      <Routes>
+        <Route path='/' element={<Main />} />
+        <Route path='/users' element={<Users />} />
+        <Route path='/users/:id' element={<User />} />
+      </Routes>
+    </div>
+  )
+}
+
+const User = () => {
+  const [user, setUser] = useState(null)
+  const [blogs, setBlogs] = useState([])
+  const match = useMatch('/users/:id')
+  const id = match ? match.params.id : null
+
+  const getUserData = async (id) => {
+    const user = await userService.getOne(id)
+    setUser(user)
+    const allBlogs = await blogService.getAll()
+    const ownedBlogs = allBlogs.filter((blog) => blog.user.id === user.id)
+    setBlogs(ownedBlogs)
+  }
+
+  useEffect(() => {
+    getUserData(id)
+  }, [])
+
+  if (!user) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>{user.name}</h2>
+      <h3>added blogs</h3>
+      <ul>
+        {blogs.map((blog) => (
+          <li key={blog.id}>{blog.title}</li>
+        ))}
+      </ul>
     </div>
   )
 }
@@ -166,7 +207,9 @@ const Users = () => {
         <tbody>
           {users.map((user) => (
             <tr key={user.id}>
-              <td>{user.name}</td>
+              <td>
+                <Link to={`/users/${user.id}`}>{user.name}</Link>
+              </td>
               <td>{user.blogs.length}</td>
             </tr>
           ))}
@@ -187,10 +230,10 @@ const Users = () => {
 //   )
 // }
 
-// const App = () => (
-//   <Router>
-//     <RoutedApp />
-//   </Router>
-// )
+const App = () => (
+  <Router>
+    <RoutedApp />
+  </Router>
+)
 
 export default App
