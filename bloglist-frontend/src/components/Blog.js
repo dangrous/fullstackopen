@@ -1,72 +1,88 @@
-import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import React, { useState, useEffect } from 'react'
+import { initializeBlogs, updateBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
+import { deleteBlog } from '../reducers/blogReducer'
+import { useDispatch, useSelector } from 'react-redux'
+import { useMatch, useNavigate } from 'react-router-dom'
+import blogService from '../services/blogs'
+import userService from '../services/users'
+import Comments from './Comments'
+import { Button } from 'react-bootstrap'
 
-const Blog = ({ blog, updateBlog, removeBlog, username }) => {
-  const [visibility, setVisibility] = useState(false)
+const Blog = () => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const [blog, setBlog] = useState(null)
+  const match = useMatch('/blogs/:id')
+  const id = match ? match.params.id : null
 
-  const toggleVisibility = () => {
-    setVisibility(!visibility)
+  const user = useSelector((state) => state.user)
+
+  const getBlog = async (id) => {
+    const blog = await blogService.getOne(id)
+    const user = await userService.getOne(blog.user)
+    blog.user = user
+    setBlog(blog)
   }
+
+  useEffect(() => {
+    getBlog(id)
+  }, [])
 
   const addLike = () => {
-    updateBlog(
-      {
-        user: blog.user.id,
-        likes: blog.likes + 1,
-        author: blog.author,
-        title: blog.title,
-        url: blog.url,
-      },
-      blog.id
-    )
-  }
-
-  const deleteBlog = () => {
-    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
-      removeBlog(blog.id)
+    try {
+      dispatch(updateBlog(blog.id))
+      setBlog({ ...blog, likes: blog.likes + 1 })
+    } catch (exception) {
+      dispatch(setNotification(`Could not add the like to "${blog.title}"`, 5))
     }
   }
 
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
+  const removeBlog = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      try {
+        dispatch(deleteBlog(blog.id))
+        dispatch(setNotification('Removed blog post', 5))
+        navigate('/')
+      } catch (exception) {
+        dispatch(setNotification('Could not remove blog post', 5))
+      }
+    }
   }
 
-  const blogDetails = () => (
-    <>
-      <div>{blog.url}</div>
-      <div>
-        likes {blog.likes}{' '}
-        <button className='like-button' onClick={addLike}>
-          like
-        </button>
-      </div>
-      <div>{blog.user.name}</div>
-      {username === blog.user.username ? removeButton() : ''}
-    </>
+  const removeButton = () => (
+    <Button className='mt-1' onClick={removeBlog}>
+      remove
+    </Button>
   )
 
-  const removeButton = () => <button onClick={deleteBlog}>remove</button>
+  if (!blog) {
+    return null
+  }
 
   return (
-    <div style={blogStyle} className='blog'>
-      {blog.title} {blog.author}{' '}
-      <button className='view-button' onClick={toggleVisibility}>
-        {visibility ? 'hide' : 'view'}
-      </button>
-      {visibility ? blogDetails() : ''}
+    <div>
+      <h2>{blog.title}</h2>
+      <p className='fst-italic fw-light'>{blog.author}</p>
+      URL: <a href={blog.url}>{blog.url}</a>
+      <div className='fw-bold mt-1'>
+        {blog.likes} {blog.likes === 1 ? 'like' : 'likes'}
+        <Button
+          className='like-button ms-1 p-1'
+          size='sm'
+          variant='outline-primary'
+          onClick={addLike}
+        >
+          like
+        </Button>
+      </div>
+      <div>
+        added by <em>{blog.user.name}</em>
+      </div>
+      {blog.user.username === user.username ? removeButton() : null}
+      <Comments blog={blog} />
     </div>
   )
-}
-
-Blog.propTypes = {
-  blog: PropTypes.object.isRequired,
-  updateBlog: PropTypes.func.isRequired,
-  removeBlog: PropTypes.func.isRequired,
-  username: PropTypes.string.isRequired,
 }
 
 export default Blog

@@ -1,74 +1,54 @@
 import React, { useState } from 'react'
-import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
+import { createBlog } from '../reducers/blogReducer'
+import { setNotification } from '../reducers/notificationReducer'
+import { Button, Form } from 'react-bootstrap'
 
-const BlogForm = ({ createBlog }) => {
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
-
-  const handleTitleChange = (event) => {
-    setTitle(event.target.value)
-  }
-
-  const handleAuthorChange = (event) => {
-    setAuthor(event.target.value)
-  }
-
-  const handleUrlChange = (event) => {
-    setUrl(event.target.value)
-  }
-
-  const addBlog = (event) => {
+const BlogForm = (props) => {
+  const addBlog = async (event) => {
     event.preventDefault()
-    createBlog({
-      title: title,
-      author: author,
-      url: url,
-    })
-
-    setTitle('')
-    setAuthor('')
-    setUrl('')
+    const content = {
+      title: event.target.title.value,
+      author: event.target.author.value,
+      url: event.target.url.value,
+    }
+    event.target.title.value = ''
+    event.target.author.value = ''
+    event.target.url.value = ''
+    try {
+      props.createBlog(content)
+      props.setNotification(
+        `Added a new blog, "${content.title}" by ${content.author}`,
+        5
+      )
+    } catch (exception) {
+      props.setNotification('Could not add the blog post', 5)
+    }
   }
 
   return (
     <div>
       <h2>create new</h2>
-      <form onSubmit={addBlog}>
-        <div>
-          title:
-          <input id='title' value={title} onChange={handleTitleChange} />
-        </div>
-        <div>
-          author:
-          <input
-            type='text'
-            id='author'
-            value={author}
-            name='Author'
-            onChange={handleAuthorChange}
-          />
-        </div>
-        <div>
-          url:
-          <input
-            type='text'
-            id='url'
-            value={url}
-            name='URL'
-            onChange={handleUrlChange}
-          />
-        </div>
-        <button id='blog-button' type='submit'>
-          create
-        </button>
-      </form>
+      <Form onSubmit={addBlog}>
+        <Form.Group>
+          <Form.Label>Title:</Form.Label>
+          <Form.Control type='text' id='title' name='Title' />
+          <Form.Label>Author:</Form.Label>
+          <Form.Control type='text' id='author' name='Author' />
+          <Form.Label>URL:</Form.Label>
+          <Form.Control type='text' id='url' name='URL' />
+          <Button className='mt-2' id='blog-button' type='submit'>
+            create
+          </Button>
+        </Form.Group>
+      </Form>
     </div>
   )
 }
 
-BlogForm.propTypes = {
-  createBlog: PropTypes.func.isRequired,
+const mapDispatchToProps = {
+  createBlog,
+  setNotification,
 }
 
-export default BlogForm
+export default connect(null, mapDispatchToProps)(BlogForm)

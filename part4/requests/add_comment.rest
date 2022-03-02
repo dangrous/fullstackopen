@@ -1,0 +1,11 @@
+POST http://localhost:3003/api/blogs/621ebf205b861fb1614d4391/comments
+Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3RpbmciLCJpZCI6IjYxZjFmYjhkNGNhMWMwNTcwNDRiMDQ5MSIsImlhdCI6MTY0MzI0OTc0MH0.frmF-4BxogzrZRFBB1pt2OxLhHfBPq1bwpipyHBBCTc
+
+{
+  "title": "Testing",
+  "author": "Testing Account",
+  "url": "with comments",
+  "likes": 0,
+  "comments": ["testing"]
+}

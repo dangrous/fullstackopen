@@ -1,185 +1,104 @@
-import React, { useState, useEffect, useRef } from 'react'
-import Blog from './components/Blog'
-import Notification from './components/Notification'
-import BlogForm from './components/BlogForm'
-import Togglable from './components/Togglable'
-import blogService from './services/blogs'
-import loginService from './services/login'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom'
+import { Button, Navbar, Nav } from 'react-bootstrap'
 
-const App = () => {
-  const [blogs, setBlogs] = useState([])
-  const [notification, setNotification] = useState(null)
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
+import Blog from './components/Blog'
+import BlogList from './components/BlogList'
+import LoginForm from './components/LoginForm'
+import Notification from './components/Notification'
+import User from './components/User'
+import Users from './components/Users'
+
+import blogService from './services/blogs'
+
+import { setNotification } from './reducers/notificationReducer'
+import { initializeBlogs } from './reducers/blogReducer'
+import { login, logout } from './reducers/userReducer'
+
+const RoutedApp = () => {
+  const dispatch = useDispatch()
 
   useEffect(() => {
-    const getBlogList = async () => {
-      const newList = await blogService.getAll()
-      setBlogs(newList)
-    }
-    getBlogList()
-  }, [])
+    dispatch(initializeBlogs())
+  }, [dispatch])
+
+  const user = useSelector((state) => state.user)
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      setUser(user)
+      dispatch(login(user))
       blogService.setToken(user.token)
     }
   }, [])
-
-  const addBlog = async (blogObject) => {
-    blogFormRef.current.toggleVisibility()
-    try {
-      await blogService.create(blogObject)
-      setNotification(
-        `Added a new blog, "${blogObject.title}" by ${blogObject.author}`
-      )
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-      const newList = await blogService.getAll()
-      setBlogs(newList)
-    } catch (exception) {
-      setNotification('Could not add the blog post')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
-  }
-
-  const updateBlog = async (blogObject, blogId) => {
-    try {
-      await blogService.update(blogObject, blogId)
-      const newList = await blogService.getAll()
-      setBlogs(newList)
-    } catch (exception) {
-      setNotification(`Could not add the like to "${blogObject.title}"`)
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
-  }
-
-  const removeBlog = async (blogId) => {
-    try {
-      await blogService.remove(blogId)
-      const newList = await blogService.getAll()
-      setNotification('Removed blog post')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-      setBlogs(newList)
-    } catch (exception) {
-      setNotification('Could not remove blog post')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
-  }
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-      setNotification('Logged in')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    } catch (exception) {
-      setNotification('Wrong username or password')
-      setTimeout(() => {
-        setNotification(null)
-      }, 5000)
-    }
-  }
 
   const handleLogout = async (event) => {
     event.preventDefault()
 
     window.localStorage.removeItem('loggedBlogappUser')
-    setUser(null)
+    dispatch(logout())
 
-    setNotification('Logged out')
-    setTimeout(() => {
-      setNotification(null)
-    }, 5000)
+    dispatch(setNotification('Logged out', 5))
   }
-
-  const blogFormRef = useRef()
 
   if (user === null) {
     return (
-      <div>
-        <h2>Log in to application</h2>
-        <Notification notification={notification} />
-        <form onSubmit={handleLogin}>
-          <div>
-            username{' '}
-            <input
-              id='username'
-              type='text'
-              value={username}
-              name='Username'
-              onChange={({ target }) => setUsername(target.value)}
-            />
-          </div>
-          <div>
-            password{' '}
-            <input
-              id='password'
-              type='password'
-              value={password}
-              name='Password'
-              onChange={({ target }) => setPassword(target.value)}
-            />
-          </div>
-          <button id='login-button' type='submit'>
-            login
-          </button>
-        </form>
+      <div className='container'>
+        <h2 className='mt-3'>Log in to application</h2>
+        <Notification />
+        <LoginForm />
       </div>
     )
   }
 
-  const blogForm = () => (
-    <Togglable buttonLabel='create new blog' ref={blogFormRef}>
-      <BlogForm createBlog={addBlog} />
-    </Togglable>
-  )
-
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification notification={notification} />
-      <p>
-        {user.name} logged in<button onClick={handleLogout}>logout</button>
-      </p>
-      {blogForm()}
-      {blogs.map((blog) => (
-        <Blog
-          key={blog.id}
-          blog={blog}
-          updateBlog={updateBlog}
-          removeBlog={removeBlog}
-          username={user.username}
-        />
-      ))}
+    <div className='container'>
+      <Navbar
+        CollapseOnSelect
+        expand='lg'
+        bg='dark'
+        variant='dark'
+        className='p-1'
+      >
+        <Navbar.Toggle aria-controls='responsive-navbar-nav' />
+        <Navbar.Collapse id='responsive-navbar-nav'>
+          <Nav className='mr-auto'>
+            <Nav.Link href='#' as='span'>
+              <Link to='/'>All Blogs</Link>
+            </Nav.Link>
+            <Nav.Link href='#' as='span'>
+              <Link to='/users'>Users</Link>
+            </Nav.Link>
+            <Nav.Link href='#' as='span'>
+              <em className='me-1' style={{ color: '#fff' }}>
+                {user.name} <span style={{ color: '#ccc' }}>logged in</span>
+              </em>
+              <Button variant='secondary' size='sm' onClick={handleLogout}>
+                logout
+              </Button>
+            </Nav.Link>
+          </Nav>
+        </Navbar.Collapse>
+      </Navbar>
+      <h1 className='mt-3'>Look at these great blogs!</h1>
+      <Notification />
+      <div></div>
+      <Routes>
+        <Route path='/' element={<BlogList />} />
+        <Route path='/users' element={<Users />} />
+        <Route path='/users/:id' element={<User />} />
+        <Route path='/blogs/:id' element={<Blog />} />
+      </Routes>
     </div>
   )
 }
+
+const App = () => (
+  <Router>
+    <RoutedApp />
+  </Router>
+)
 
 export default App
