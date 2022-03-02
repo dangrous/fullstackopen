@@ -7,7 +7,7 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 import { useDispatch, useSelector } from 'react-redux'
 import { setNotification } from './reducers/notificationReducer'
-import { initializeBlogs } from './reducers/blogReducer'
+import { initializeBlogs, updateBlog, deleteBlog } from './reducers/blogReducer'
 import { login, logout } from './reducers/userReducer'
 import {
   BrowserRouter as Router,
@@ -114,6 +114,7 @@ const RoutedApp = () => {
         <Route path='/' element={<Main />} />
         <Route path='/users' element={<Users />} />
         <Route path='/users/:id' element={<User />} />
+        <Route path='/blogs/:id' element={<BlogPage />} />
       </Routes>
     </div>
   )
@@ -219,16 +220,65 @@ const Users = () => {
   )
 }
 
-// const RoutedApp = () => {
-//   return (
-//     <div>
-//       <Routes>
-//         <Route path='/' element={<Main />} />
-//         <Route path='/users' element={<Users />} />
-//       </Routes>
-//     </div>
-//   )
-// }
+const BlogPage = () => {
+  const dispatch = useDispatch()
+  const [blog, setBlog] = useState(null)
+  const match = useMatch('/blogs/:id')
+  const id = match ? match.params.id : null
+
+  const user = useSelector((state) => state.user)
+
+  const getBlog = async (id) => {
+    const blog = await blogService.getOne(id)
+    const user = await userService.getOne(blog.user)
+    blog.user = user
+    setBlog(blog)
+  }
+
+  useEffect(() => {
+    getBlog(id)
+  }, [])
+
+  const addLike = () => {
+    try {
+      dispatch(updateBlog(blog.id))
+    } catch (exception) {
+      dispatch(setNotification(`Could not add the like to "${blog.title}"`, 5))
+    }
+  }
+
+  const removeBlog = () => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}?`)) {
+      try {
+        dispatch(deleteBlog(blog.id))
+        dispatch(setNotification('Removed blog post', 5))
+      } catch (exception) {
+        dispatch(setNotification('Could not remove blog post', 5))
+      }
+    }
+  }
+
+  const removeButton = () => <button onClick={removeBlog}>remove</button>
+
+  if (!blog) {
+    return null
+  }
+
+  return (
+    <div>
+      <h2>{blog.title}</h2>
+      <a href={blog.url}>{blog.url}</a>
+      <div>
+        {blog.likes} {blog.likes === 1 ? 'like' : 'likes'}
+        <button className='like-button' onClick={addLike}>
+          like
+        </button>
+      </div>
+      <div>added by {blog.user.name}</div>
+      {blog.user.username === user.username ? removeButton() : null}
+    </div>
+  )
+}
 
 const App = () => (
   <Router>

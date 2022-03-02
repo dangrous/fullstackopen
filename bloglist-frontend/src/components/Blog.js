@@ -4,6 +4,7 @@ import { updateBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import { deleteBlog } from '../reducers/blogReducer'
 import { useDispatch } from 'react-redux'
+import { Link } from 'react-router-dom'
 
 const Blog = ({ blog, username }) => {
   const dispatch = useDispatch()
@@ -58,11 +59,9 @@ const Blog = ({ blog, username }) => {
 
   return (
     <div style={blogStyle} className='blog'>
-      {blog.title} {blog.author}{' '}
-      <button className='view-button' onClick={toggleVisibility}>
-        {visibility ? 'hide' : 'view'}
-      </button>
-      {visibility ? blogDetails() : ''}
+      <Link to={`/blogs/${blog.id}`}>
+        {blog.title} {blog.author}
+      </Link>
     </div>
   )
 }
