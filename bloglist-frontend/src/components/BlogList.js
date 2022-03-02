@@ -1,23 +1,39 @@
-// import { useDispatch, useSelector } from 'react-redux'
-// import Blog from './Blog'
+import React, { useRef } from 'react'
+import { useSelector } from 'react-redux'
+import Togglable from './Togglable'
+import BlogForm from './BlogForm'
+import { Link } from 'react-router-dom'
 
-// const BlogList = () => {
-//   const dispatch = useDispatch()
-//   const blogs = useSelector((state) => state.blogs)
+const BlogList = () => {
+  const blogs = useSelector((state) => state.blogs)
+  const blogFormRef = useRef()
 
-//   return (
-//     <div>
-//       {blogs.map((blog) => (
-//         <Blog
-//           key={blog.id}
-//           blog={blog}
-//           updateBlog={updateBlog}
-//           removeBlog={removeBlog}
-//           username={user.username}
-//         />
-//       ))}
-//     </div>
-//   )
-// }
+  const blogForm = () => (
+    <Togglable buttonLabel='create new blog' ref={blogFormRef}>
+      <BlogForm />
+    </Togglable>
+  )
 
-// export default BlogList
+  const blogStyle = {
+    paddingTop: 10,
+    paddingLeft: 2,
+    border: 'solid',
+    borderWidth: 1,
+    marginBottom: 5,
+  }
+
+  return (
+    <div>
+      {blogForm()}
+      {blogs.map((blog) => (
+        <div key={blog.id} style={blogStyle} className='blog'>
+          <Link to={`/blogs/${blog.id}`}>
+            {blog.title} {blog.author}
+          </Link>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+export default BlogList
