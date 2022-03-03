@@ -1,6 +1,7 @@
 .DS_Store
 notes/backend
 node_modules
+notes/backend
 webpack-part7/node_modules/.package-lock.json
 webpack-part7/node_modules/.bin/acorn
 webpack-part7/node_modules/.bin/ansi-html
@@ -9990,4 +9991,7 @@ webpack-part7/node_modules/strip-ansi/readme.md
 webpack-part7/node_modules/strip-final-newline/index.js
 webpack-part7/node_modules/strip-final-newline/license
 webpack-part7/node_modules/strip-final-newline/package.json
-notes/backend
+webpack-part7/node_modules/strip-final-newline/readme.md
+webpack-part7/node_modules/style-loader/LICENSE
+webpack-part7/node_modules/style-loader/README.md
+webpack-part7/node_modules/style-loader/dist/cjs.js
