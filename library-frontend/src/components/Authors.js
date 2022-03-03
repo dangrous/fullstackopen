@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { gql, useQuery } from '@apollo/client'
 
 const ALL_AUTHORS = gql`
@@ -12,7 +11,9 @@ const ALL_AUTHORS = gql`
 `
 
 const Authors = (props) => {
-  const result = useQuery(ALL_AUTHORS)
+  const result = useQuery(ALL_AUTHORS, {
+    skip: !props.show,
+  })
 
   if (!props.show) {
     return null
@@ -23,7 +24,6 @@ const Authors = (props) => {
   }
 
   const authors = result.data.allAuthors
-  console.log(authors)
 
   return (
     <div>
