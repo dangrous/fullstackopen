@@ -2,8 +2,6 @@ const { ApolloServer, UserInputError, gql } = require('apollo-server')
 const mongoose = require('mongoose')
 const Book = require('./models/book')
 const Author = require('./models/author')
-const { v1: uuid } = require('uuid')
-const person = require('../part8/models/person')
 require('dotenv').config()
 
 const MONGODB_URI = process.env.MONGODB_URI
@@ -151,17 +149,18 @@ const resolvers = {
     bookCount: async () => Book.collection.countDocuments(),
     authorCount: async () => Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      if (!args.author && !args.genre) {
-        return Book.find({})
-      }
+      let queries = {}
 
       if (args.author) {
-        return Book.find({ author: args.author })
+        const author = await Author.findOne({ name: args.author })
+        queries.author = author.id
       }
 
       if (args.genre) {
-        return Book.find({ genres: { $in: args.genre } })
+        queries.genres = { $in: args.genre }
       }
+
+      return Book.find(queries)
       // const byAuthor = (book) =>
       //   args.author ? book.author === args.author : true
       // const byGenre = (book) =>
