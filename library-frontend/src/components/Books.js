@@ -3,41 +3,37 @@ import { ALL_BOOKS } from '../queries'
 import { useState } from 'react'
 
 const Books = (props) => {
-  const [filter, setFilter] = useState('all')
+  const [filter, setFilter] = useState(null)
+  const [genres, setGenres] = useState([])
 
-  const result = useQuery(ALL_BOOKS, {
+  const { loading, data } = useQuery(ALL_BOOKS, {
     skip: !props.show,
+    variables: { genre: filter },
   })
 
   if (!props.show) {
     return null
   }
 
-  if (result.loading) {
+  if (loading) {
     return <div>loading...</div>
   }
 
-  let books = result.data.allBooks
-
-  let genres = []
+  let books = data.allBooks
 
   books.map((b) => {
     b.genres.map((g) => {
       if (!genres.includes(g)) {
-        genres.push(g)
+        setGenres([...genres, g])
       }
     })
   })
-
-  if (filter !== 'all') {
-    books = books.filter((b) => b.genres.includes(filter))
-  }
 
   return (
     <div>
       <h2>books</h2>
       <div>
-        in genre <strong>{filter}</strong>
+        in genre <strong>{filter ? filter : 'all'}</strong>
       </div>
       <table>
         <tbody>
@@ -61,7 +57,7 @@ const Books = (props) => {
             {g}
           </button>
         ))}
-        <button onClick={() => setFilter('all')}>all genres</button>
+        <button onClick={() => setFilter(null)}>all genres</button>
       </div>
     </div>
   )
