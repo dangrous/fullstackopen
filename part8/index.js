@@ -1,4 +1,9 @@
-const { ApolloServer, UserInputError, gql } = require('apollo-server')
+const {
+  ApolloServer,
+  UserInputError,
+  AuthenticationError,
+  gql,
+} = require('apollo-server')
 const mongoose = require('mongoose')
 const Person = require('./models/person')
 const User = require('./models/user')
