@@ -1,5 +1,28 @@
-const { ApolloServer, gql } = require('apollo-server')
+const { ApolloServer, UserInputError, gql } = require('apollo-server')
+const mongoose = require('mongoose')
+const Book = require('./models/book')
+const Author = require('./models/author')
 const { v1: uuid } = require('uuid')
+const person = require('../part8/models/person')
+require('dotenv').config()
+
+const MONGODB_URI = process.env.MONGODB_URI
+
+console.log('connecting to', MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+  useFindAndModify: false,
+  useCreateIndex: true,
+})
+
+mongoose
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log('connected to MongoDB')
+  })
+  .catch((error) => {
+    console.log('error connection to MongoDB:', error.message)
+  })
 
 let authors = [
   {
@@ -93,9 +116,9 @@ const typeDefs = gql`
   type Book {
     title: String!
     published: Int!
-    author: String!
-    id: ID!
+    author: Author!
     genres: [String!]!
+    id: ID!
   }
 
   type Author {
@@ -125,11 +148,11 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    bookCount: () => books.length,
-    authorCount: () => authors.length,
-    allBooks: (root, args) => {
+    bookCount: async () => Book.collection.countDocuments(),
+    authorCount: async () => Author.collection.countDocuments(),
+    allBooks: async (root, args) => {
       if (!args.author && !args.genre) {
-        return books
+        return Book.find({})
       }
       const byAuthor = (book) =>
         args.author ? book.author === args.author : true
@@ -137,7 +160,9 @@ const resolvers = {
         args.genre ? book.genres.includes(args.genre) : true
       return books.filter(byGenre).filter(byAuthor)
     },
-    allAuthors: () => authors,
+    allAuthors: async () => {
+      return Author.find({})
+    },
   },
   Author: {
     bookCount: (root) => {
@@ -145,18 +170,18 @@ const resolvers = {
     },
   },
   Mutation: {
-    addBook: (root, args) => {
+    addBook: async (root, args) => {
       const book = { ...args, id: uuid() }
-      books = books.concat(book)
-      let author = authors.find((author) => author.name === book.author)
-      if (!author) {
-        author = {
-          name: book.author,
-          id: uuid(),
-        }
-        authors = authors.concat(author)
-      }
-      return book
+      return book.save()
+      // let author = authors.find((author) => author.name === book.author)
+      // if (!author) {
+      //   author = {
+      //     name: book.author,
+      //     id: uuid(),
+      //   }
+      //   authors = authors.concat(author)
+      // }
+      // return book
     },
     editAuthor: (root, args) => {
       const author = authors.find((author) => author.name === args.name)
