@@ -26,7 +26,9 @@ const Books = (props) => {
       if (!genres.includes(g)) {
         setGenres([...genres, g])
       }
+      return 0
     })
+    return 0
   })
 
   return (
