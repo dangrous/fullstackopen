@@ -11,7 +11,7 @@ const NewBook = (props) => {
 
   const [createBook] = useMutation(CREATE_BOOK, {
     skip: !props.show,
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
+    refetchQueries: [ALL_BOOKS, ALL_AUTHORS],
   })
 
   if (!props.show) {
@@ -28,6 +28,7 @@ const NewBook = (props) => {
     setAuthor('')
     setGenres([])
     setGenre('')
+    props.setPage('books')
   }
 
   const addGenre = () => {
@@ -37,6 +38,7 @@ const NewBook = (props) => {
 
   return (
     <div>
+      <h2>add a new book</h2>
       <form onSubmit={submit}>
         <div>
           title
